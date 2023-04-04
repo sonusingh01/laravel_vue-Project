@@ -1,7 +1,7 @@
 <template>
     <Header></Header>
     <div class="container">
-      <img src="../assets/logo1.png" class="logo" />
+   
       <h1>SignUp</h1>
       <form action="" @submit.prevent="handleSubmission" >
       <input type="text"  placeholder="Name" v-model="name" />
