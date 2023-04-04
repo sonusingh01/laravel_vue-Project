@@ -1,124 +1,172 @@
 <template>
-    <div>
-        <Header></Header>
-        
-        <div class="container">
-            <h1>Register Page</h1>
-            <form>
-                <label>
-                    UserName:
-                    <input type="text" v-model="name" />
-                  
-                </label>
-                <label>
-                    Email:
-                    <input type="email" v-model="email" />
-                </label>
-                <label>
-                    Password:
-                    <input type="password" v-model="password" />
-                </label>
-                <button type="submit" @click.prevent="login">Register</button>
-            </form>
-            <p v-if="error">{{ error }}</p>
-        </div>
-
+    <Header></Header>
+    <div class="container">
+      <img src="../assets/logo1.png" class="logo" />
+      <h1>SignUp</h1>
+      <form action="" @submit.prevent="handleSubmission" >
+      <input type="text"  placeholder="Name" v-model="name" />
+      <span v-if="msg.name" style="color:red">{{ msg.name }}</span>
+      <input type="email"  placeholder="Email"  v-model="email"/>
+      <span v-if="msg.email" style="color:red">{{ msg.email }}</span>
+      <input type="password" placeholder="Password"  v-model="password"/>
+        <span v-if="msg.password" style="color:red">{{ msg.password }}</span>
+          <button :disabled="isLoading">
+            <div class="spinner-border" role="status" v-if="isLoading">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <span v-else>Submit</span>
+        </button>
+      </form>
+      <p>
+        <router-link to="/sign-in">Login</router-link>
+      </p>
     </div>
-</template>
+  </template>
   
-<script>
-import Header from "./Header.vue"
-export default {
-    name: "LoginView",
-    components: {
+  <script>
+  import axios from "axios"
+  import Header from "./Header.vue";
+  
+  export default {
+    name: "RegisterView",
+    components:{
         Header
     },
     data() {
-        return {
-            name:"",
-            email: '',
-            password: '',
-            error: ''
-        }
+     return {
+      isLoading: false,
+      name:"",
+      email:"",
+      password:"",
+      msg: [],
+      disabled: [true, true],
+     }
+  },
+  watch: {
+    name(value) {
+        // binding this to the data value in the email input
+        // this.email = value;
+        this.validateName(value);
+      },
+      email(value) {
+        // binding this to the data value in the email input
+        // this.email = value;
+        this.validateEmail(value);
+      },
+      password(value) {
+        // this.password = value;
+        this.validatePassword(value);
+      },
     },
-    watch: {
-        name: function (newVal) {
-            this.validateName(newVal)
-        },
-        email: function (newVal) {
-            this.validateEmail(newVal)
-        },
-        password: function (newVal) {
-            this.validatePassword(newVal)
+  methods: {
+    validateName(value) {
+        
+        if (value.length < 20) {
+          this.msg['name'] = '';
+            this.disabled = [false, this.disabled[1]]
+        } else {
+          this.msg['name'] = 'Invalid name';
+      this.disabled = [true, this.disabled[1]]
         }
-    },
-    methods: {
-        validateName(name) {
-            this.error = 'name is required'
-        },
-        validateEmail(email) {
-            if (!email) {
-                this.error = 'Email is required'
-            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                this.error = 'Invalid email format'
-            } else {
-                this.error = ''
-            }
-        },
-
-
-        validatePassword(password) {
-            this.error = 'Password is required'
-        },
-        login() {
-            // login logic
+      },
+    validateEmail(value){
+        if (/[a-zA-Z0-9.]*@[a-z]*[.a-z]*/.test(value))
+    {
+      this.msg['email'] = '';
+      this.disabled = [false, this.disabled[1]]
+    } else{
+      this.msg['email'] = 'Invalid Email Address';
+      this.disabled = [true, this.disabled[1]]
+    } 
+      },
+      validatePassword(value) {
+        let difference = 8 - value.length;
+        if (value.length < 8) {
+          this.msg["password"] =
+            "Must be 8 characters! " + difference + " characters left";
+          this.disabled = [this.disabled[1], true];
+        } else {
+          this.msg["password"] = "";
+          this.disabled = [this.disabled[1], false];
         }
+      },
+    async handleSubmission(){
+      if (!this.name) {
+      this.msg["name"] = "Please enter your name";
+      return
+      }
+      if (!this.email) {
+      this.msg["email"] = "Please enter your email";
+      return;
     }
-}
-</script>
-<style scoped>
-.container{
+    if (!this.password) {
+      this.msg["password"] = "Please enter your password";
+      return;
+    }
+    
+      try {
+          this.isLoading = true;
+  
+          // const hashedPassword = await hashPassword(this.password);
+         const formdata={
+        name:this.name,
+        email:this.email,
+        password:this.password,
+      }
+          const response = await axios.post(
+            "http://localhost:3000/api/register",
+            formdata
+          );
+          if (response.status === 201) {
+            this.$router.push({name:"SignIn"})
+          }
+        } catch (error) {
+          console.log(error);
+          // Handle error here
+        } finally {
+          setTimeout(() => {
+            this.isLoading = false;
+          }, 1000);
+        } 
+  
+    },
+   
+  },
+  
+  }
+  </script>
+  
+  <style scoped>
+  .logo{
+    width:100px;
+  }
+  .container {
+    display: flex;
+    flex-direction: column;
     width: 50%;
+    align-items: center;
+    padding: 20px;
+    margin: 20px;
     margin: auto;
-}
-h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-}
-
-form {
+    height: 30%;
+  }
+  .container form{
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-label {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-input[type="email"],
-input[type="text"],
-input[type="password"] {
-    font-size: 1rem;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-}
-
-button[type="submit"] {
-    font-size: 1rem;
-    padding: 0.5rem;
-    border: none;
-    border-radius: 3px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-}
-
-p {
-    color: red;
-}
-</style>
+  }
+  .container input {
+    margin: 10px;
+    width: 300px;
+    height: 30px;
+    text-align: center;
+  }
+  .container button{
+      width: 309px;
+      padding: 10px;
+      margin: 5px;
+      font-size: 15px;
+      background-color: rgb(36, 108, 74);
+      color:white
+  }
+  </style>
+  

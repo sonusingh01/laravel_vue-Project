@@ -4,6 +4,9 @@ import ContactView from "./pages/Contact.vue"
 import ServicView from "./pages/Service.vue"
 import LoginView from "./pages/Login.vue"
 import RegisterView from "./pages/Register.vue"
+import ProductDes from "./components/ProductDes.vue"
+import PostsView from "./pages/PostView.vue"
+import AuthorView from "./pages/AuthorView.vue"
 import {createRouter, createWebHistory} from "vue-router";
 const routes=[
     {
@@ -36,6 +39,21 @@ const routes=[
         path:'/register',
         component:RegisterView
     },
+    {
+        path: '/products/:id',
+        name: 'product',
+        component: ProductDes
+      },
+      {
+        path: '/post',
+        name: 'posts',
+        component: PostsView
+      },
+      {
+        path: '/author',
+        name: 'author',
+        component: AuthorView
+      },
    
 ]
 
